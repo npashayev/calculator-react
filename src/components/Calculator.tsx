@@ -9,7 +9,7 @@ const Calculator = () => {
     const [calculator, setCalculator] = useState("");
     const [calculated, setCalculated] = useState(false);
 
-    const operators = ['+', '-', '*', '/', '.', '%'];
+    const operators = ['+', '-', '*', '/', '.'];
 
     const clear = ():void => {
         setCalculator("");
@@ -56,7 +56,7 @@ const Calculator = () => {
         if (value === ")" && (calculator.split("(").length <= calculator.split(")").length)) return;
 
         if (value === ".") {
-            const currentNumber = calculator.split(/[+\-*/%]/).at(-1) ?? "";
+            const currentNumber = calculator.split(/[+\-*/]/).at(-1) ?? "";
             if (currentNumber.includes(".")) return;
         }
 
