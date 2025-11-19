@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './calculator.module.scss';
-import { faDeleteLeft, faDivide, faMinus, faMoon, faPercent, faPlus, faSun, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
+import { faDeleteLeft, faDivide, faMinus, faMoon, faPlus, faSun, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {  useEffect, useState, type JSX } from 'react';
 import { evaluate } from 'mathjs';
 
 const Calculator = () => {
@@ -11,16 +11,16 @@ const Calculator = () => {
 
     const operators = ['+', '-', '*', '/', '.', '%'];
 
-    const clear = useCallback(() => {
+    const clear = ():void => {
         setCalculator("");
-    }, []);
+    };
 
-    const deleteLast = useCallback(() => {
+    const deleteLast = ():void => {
         if (calculator !== "") {
             const newCalculator = calculator.slice(0, -1);
             setCalculator(newCalculator);
         }
-    }, [calculator]);
+    };
 
     const specialButtons = [
         { label: "C", action: clear },
@@ -41,12 +41,12 @@ const Calculator = () => {
         { icon: faPlus, value: "+" },
     ];
 
-    const toggleTheme = () => {
+    const toggleTheme = ():void => {
         document.body.classList.toggle("darkTheme", !darkTheme);
         setDarkTheme(prev => !prev);
     };
 
-    const updateCalculator = useCallback((value: string) => {
+    const updateCalculator = (value: string):void => {
         const lastChar = calculator.slice(-1);
 
         if (operators.includes(value)) {
@@ -56,9 +56,13 @@ const Calculator = () => {
         if (value === ")" && (calculator.split("(").length <= calculator.split(")").length)) return;
 
         if (value === ".") {
-            const parts = calculator.split(/[+\-*/%]/);
-            const currentNumber = parts[parts.length - 1];
+            const currentNumber = calculator.split(/[+\-*/%]/).at(-1) ?? "";
             if (currentNumber.includes(".")) return;
+        }
+
+        if (value === "0") {
+            const lastNumber = calculator.split(/[+\-*/]/).at(-1) ?? "";
+            if (lastNumber === "0") return;
         }
 
         if (calculated) {
@@ -68,9 +72,9 @@ const Calculator = () => {
             setCalculator(prev => prev + value);
         }
 
-    }, [calculator, calculated]);
+    };
 
-    const createDigits = useCallback(() => {
+    const createDigits = ():JSX.Element[] => {
         const digits: JSX.Element[] = [];
         for (let i = 1; i <= 9; i++) {
             digits.push(
@@ -84,9 +88,9 @@ const Calculator = () => {
         };
 
         return digits;
-    }, [updateCalculator]);
+    };
 
-    const calculate = () => {
+    const calculate = ():void => {
         try {
             const result = evaluate(calculator);
 
@@ -104,7 +108,7 @@ const Calculator = () => {
     };
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const handleKeyDown = (e: KeyboardEvent):void => {
             const key = e.key;
 
             if (/^[0-9]$/.test(key) || operators.includes(key)) {
@@ -117,10 +121,19 @@ const Calculator = () => {
                     calculate();
                     break;
                 case "Backspace":
-                    deleteLast();
+                    if (calculated) {
+                        clear();
+                        return;
+                    } else deleteLast();
                     break;
                 case "Escape":
                     clear();
+                    break;
+                case "(":
+                    updateCalculator(key);
+                    break;
+                case ")":
+                    updateCalculator(key);
                     break;
             }
         };
@@ -128,7 +141,7 @@ const Calculator = () => {
         window.addEventListener("keydown", handleKeyDown);
 
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
+    }, [calculator]);
 
     return (
         <div className={styles.calculator}>
