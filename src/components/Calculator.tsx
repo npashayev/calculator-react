@@ -21,13 +21,19 @@ const Calculator = () => {
 
   const clear = (): void => {
     setCalculator("");
+    setCalculated(false);
   };
 
   const deleteLast = (): void => {
+    if (calculated) {
+      clear();
+      return;
+    }
     if (calculator !== "") {
       const newCalculator = calculator.slice(0, -1);
       setCalculator(newCalculator);
     }
+    setCalculated(false);
   };
 
   const specialButtons = [
@@ -55,10 +61,14 @@ const Calculator = () => {
   };
 
   const updateCalculator = (value: string): void => {
+    setCalculated(false);
     const lastChar = calculator.slice(-1);
 
     if (operators.includes(value)) {
-      if (calculator === "" || operators.includes(lastChar)) return;
+      if (calculator === "" || operators.includes(lastChar)) {
+        setCalculator(prev => prev.slice(0, -1) + value);
+        return;
+      };
     }
 
     if (
@@ -77,9 +87,12 @@ const Calculator = () => {
       if (lastNumber === "0") return;
     }
 
-    setCalculator((prev) => prev + value);
+    setCalculator(prev => {
+      if (prev === "Error") return value;
+      else return prev + value;
+    });
   };
-
+  useEffect(() => console.log(calculated), [calculated]);
   const createDigits = (): JSX.Element[] => {
     const digits: JSX.Element[] = [];
     for (let i = 1; i <= 9; i++) {
@@ -95,19 +108,22 @@ const Calculator = () => {
 
   const calculate = (): void => {
     try {
-      const result = evaluate(calculator);
+      const expression = operators.includes(calculator.slice(-1))
+        ? calculator.slice(0, -1)
+        : calculator;
+
+      const result = evaluate(expression);
 
       if (typeof result !== "number" || !isFinite(result)) {
         setCalculator("Error");
       } else {
         setCalculator(result.toString());
       }
-
-      setCalculated(true);
     } catch {
       setCalculator("Error");
-      setCalculated(true);
     }
+
+    setCalculated(true);
   };
 
   useEffect(() => {
@@ -126,7 +142,6 @@ const Calculator = () => {
         case "Backspace":
           if (calculated) {
             clear();
-            return;
           } else deleteLast();
           break;
         case "Escape":
