@@ -92,7 +92,7 @@ const Calculator = () => {
       else return prev + value;
     });
   };
-  useEffect(() => console.log(calculated), [calculated]);
+
   const createDigits = (): JSX.Element[] => {
     const digits: JSX.Element[] = [];
     for (let i = 1; i <= 9; i++) {
