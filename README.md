@@ -2,6 +2,9 @@
 
 A responsive calculator built with **React**, **TypeScript**, and **SCSS**, featuring keyboard support, theme toggle, and safe arithmetic evaluation using `mathjs`.
 
+## Live Demo
+[https://simplereactcalculator.netlify.app/](https://simplereactcalculator.netlify.app/)
+
 ## Features
 
 - Basic arithmetic: `+`, `-`, `*`, `/`
